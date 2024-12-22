@@ -2,6 +2,7 @@ import {
 	calculateCoffeeStats,
 	calculateCurrentCaffeineLevel,
 	coffeeConsumptionHistory,
+	getTopThreeCoffees,
 	statusLevels,
 } from "../utils";
 
@@ -74,13 +75,23 @@ export default function Stats() {
 				<table className="stat-table">
 					<thead>
 						<tr>
-              <th>Coffee Name</th>
+              <th>Product Name</th>
               <th>Number of Purchase</th>
               <th>Percentage of Total</th>
               </tr>
 					</thead>
-          <tbody></tbody>
-          {}
+          <tbody>
+            {getTopThreeCoffees(coffeeConsumptionHistory).map((coffee,coffeeIndex)=>{
+return (
+  <tr key={coffeeIndex}>
+    <td>{coffee?.coffeeName}</td>
+    <td>{coffee?.count}</td>
+    <td>{coffee?.percentage}</td>
+  </tr>
+)
+            })}
+          </tbody>
+
 				</table>
 			</div>
 		</>
