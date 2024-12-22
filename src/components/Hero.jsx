@@ -2,7 +2,7 @@ export default function Hero() {
 	return (
 		<>
 			<h1>
-				<abb title="Caffeine should be counted">Coffee Counts!!</abb>
+				Coffee Counts!!
 			</h1>
 			<div className="benefits-list">
 				<h3 className="font-bolder">
