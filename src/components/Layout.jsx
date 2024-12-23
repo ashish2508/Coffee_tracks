@@ -1,5 +1,9 @@
+import { useState } from "react";
+import Authentication from "./Authentication";
+import Modal from "./Modal";
 export default function Layout(props) {
 	const { children } = props;
+	const [showModal, setShowModal] = useState(false);
 
 	const header = (
 		<header>
@@ -7,8 +11,9 @@ export default function Layout(props) {
 				<h1 className="text-gradient">CAFFIEND</h1>
 				<p>For Coffee Adects :)</p>
 			</div>
-			<button>
-				Sign Up free
+			<button onClick={() => {setShowModal(true)}}
+			>
+				<p> Sign Up free</p>
 				<i className="fa-solid fa-mug-hot"></i>
 			</button>
 		</header>
@@ -18,13 +23,24 @@ export default function Layout(props) {
 		<footer>
 			<p>
 				<span className="text-gradient">Caffiend</span> was made by
-				<a href="https://github.com/ashish2508"> Ashish Jha </a>
-				 👈🏻(this guy got help)
+				<a
+					href="https://github.com/ashish2508/Coffee_tracks"
+					target="_blank"
+					title="For github link click on the Name here :]"
+				>
+					{" "}
+					Ashish Jha
+				</a>
 			</p>
 		</footer>
 	);
 	return (
 		<>
+			{showModal && (
+				<Modal handleCloseModal={()=>{setShowModal(false)}}>
+					<Authentication />
+				</Modal>
+			)}
 			{header}
 			<main>{children}</main>
 			{footer}
