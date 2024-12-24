@@ -65,7 +65,7 @@ export default function PayQR() {
 						onClick={(e) => e.stopPropagation()}
 					>
 						<img
-							src="/public/pay.jpg"
+							src="/pay.jpg"
 							alt="QR Code"
 							style={{
 								width: "400px",
