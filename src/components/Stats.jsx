@@ -1,3 +1,4 @@
+import { useAuth } from "../context/AuthContext";
 import {
 	calculateCoffeeStats,
 	calculateCurrentCaffeineLevel,
@@ -17,8 +18,9 @@ function StatCard(props) {
 }
 
 export default function Stats() {
-	const stats = calculateCoffeeStats(coffeeConsumptionHistory);
-	const caffeineLevel = calculateCurrentCaffeineLevel(coffeeConsumptionHistory);
+  const {globalData}=useAuth()
+	const stats = calculateCoffeeStats(globalData);
+	const caffeineLevel = calculateCurrentCaffeineLevel(globalData);
 	const warningLevel =
 		caffeineLevel < statusLevels["low"].maxLevel
 			? "low"
@@ -44,7 +46,7 @@ export default function Stats() {
 								background: statusLevels[warningLevel]?.background,
 							}}
 						>
-							Low
+							{warningLevel}
 						</h5>
 					</div>
 					<p>{statusLevels[warningLevel].description}</p>
@@ -75,23 +77,22 @@ export default function Stats() {
 				<table className="stat-table">
 					<thead>
 						<tr>
-              <th>Product Name</th>
-              <th>Number of Purchase</th>
-              <th>Percentage of Total</th>
-              </tr>
+							<th>Product Name</th>
+							<th>Number of Purchase</th>
+							<th>Percentage of Total</th>
+						</tr>
 					</thead>
-          <tbody>
-            {getTopThreeCoffees(coffeeConsumptionHistory).map((coffee,coffeeIndex)=>{
-return (
-  <tr key={coffeeIndex}>
-    <td>{coffee?.coffeeName}</td>
-    <td>{coffee?.count}</td>
-    <td>{coffee?.percentage}</td>
-  </tr>
-)
-            })}
-          </tbody>
-
+					<tbody>
+						{getTopThreeCoffees(globalData).map((coffee, coffeeIndex) => {
+							return (
+								<tr key={coffeeIndex}>
+									<td>{coffee?.coffeeName}</td>
+									<td>{coffee?.count}</td>
+									<td>{coffee?.percentage}</td>
+								</tr>
+							);
+						})}
+					</tbody>
 				</table>
 			</div>
 		</>

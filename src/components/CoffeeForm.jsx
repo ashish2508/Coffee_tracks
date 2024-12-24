@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import { coffeeOptions } from "../utils";
 import Authentication from "./Authentication";
 import Modal from "./Modal";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 export default function CoffeeForm(props) {
 	const { isAuthenticated } = props;
 	const [showModal, setShowModal] = useState(false);
@@ -10,23 +13,53 @@ export default function CoffeeForm(props) {
 	const [coffeeCost, setCoffeeCost] = useState(0);
 	const [hour, setHour] = useState(0);
 	const [mint, setMint] = useState(0);
-
-	function handleSubmitForm() {
+	const { globalData,setGlobalData,globalUser } = useAuth();
+	async function handleSubmitForm() {
 		if (!isAuthenticated) {
 			setShowModal(true);
 			return;
 		}
-	}
 
+
+	if (!selectedCoffee) {
+		return;
+	}
+  try {
+		const newGlobalData = { ...(globalData || {}) };
+		const nowTime = Date.now();
+
+		const timeToSubtract = hour * 60 * 60 * 1000 + mint * 60 * 100;
+		const timeStamp = nowTime - timeToSubtract;
+		const newData = {
+			name: selectedCoffee,
+			cost: coffeeCost,
+		};
+		newGlobalData[timeStamp] = newData;
+		setGlobalData(newGlobalData);
+		const userRef = doc(db, "users", globalUser.uid);
+		const res = await setDoc(
+			userRef,
+			{
+				[timeStamp]: newData,
+			},
+			{ merge: true }
+		);
+    setSelectedCoffee(null)
+    setCoffeeCost(0);
+    setHour(0);
+    setMint(0);
+
+	} catch (error) {
+return  }
+  }
+	function handleCloseModal() {
+		setShowModal(false);
+	}
 	return (
 		<>
 			{showModal && (
-				<Modal
-					handleCloseModal={() => {
-						setShowModal(false);
-					}}
-				>
-					<Authentication />
+				<Modal handleCloseModal={handleCloseModal}>
+					<Authentication handleCloseModal={handleCloseModal} />
 				</Modal>
 			)}
 			<div className="section-header">
@@ -104,8 +137,9 @@ export default function CoffeeForm(props) {
 					<select
 						name="time"
 						id="hours-select"
+            value={hour}
 						onChange={(e) => {
-							setHour(e.target.value);
+							setHour(Number(e.target.value));
 						}}
 					>
 						{[
@@ -130,8 +164,9 @@ export default function CoffeeForm(props) {
 					<select
 						name="time"
 						id="mins-select"
+            value={mint}
 						onChange={(e) => {
-							setMint(e.target.value);
+							setMint(Number(e.target.value));
 						}}
 					>
 						{[0, 5, 10, 15, 20, 25, 30, 25, 40, 45, 50, 55].map(

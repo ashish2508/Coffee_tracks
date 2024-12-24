@@ -1,12 +1,55 @@
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
-export default function Authentication() {
+export default function Authentication(props) {
+  const {handleCloseModal}=props
 	const [isRegistration, setIsRegistration] = useState(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isAuthenticating, setIsAuthenticating] = useState(false);
+	const { signup, login } = useAuth();
+	const [authError, setAuthError] = useState("");
 
-	async function handleAuthenticate() {}
+	async function handleAuthenticate() {
+		if (
+			!email ||
+			!email.includes("@") ||
+			!password ||
+			password.length < 6 ||
+			isAuthenticating
+		) {
+			return;
+		}
+		try {
+			setIsAuthenticating(true);
+			setAuthError("");
+			if (isRegistration) {
+				await signup(email, password);
+			} else {
+				await login(email, password);
+			}
+      handleCloseModal();
+		} catch (err) {
+			const msg = err.message
+				.replace("Firebase: Error (auth/", "")
+				.replace(").", "");
+			let errorMessage = "";
+
+			if (msg === "email-already-in-use") {
+				errorMessage =
+					"This email is already in use. Please use a different email.";
+			} else if (msg === "invalid-credential") {
+				errorMessage =
+					"Invalid credentials. Please check your email and password.";
+			} else {
+				errorMessage = "An error occurred. Please try again.";
+			}
+			setAuthError(errorMessage);
+      return
+		} finally {
+			setIsAuthenticating(false);
+		}
+	}
 
 	return (
 		<>
@@ -14,6 +57,8 @@ export default function Authentication() {
 			<p>
 				{isRegistration ? "Create Your Account!" : "Sign in to your account"}
 			</p>
+			{authError && <h2 style={{ color: "darkred" }}>{authError}</h2>}
+
 			<label>Email</label>
 			<input
 				type="email"
@@ -37,7 +82,7 @@ export default function Authentication() {
 				}}
 			/>
 			<button onClick={handleAuthenticate}>
-				<p>Submit</p>
+				<p>{isAuthenticating ? "Authenticating.." : "Submit"}</p>
 			</button>
 			<hr />
 			<div className="register-content">
